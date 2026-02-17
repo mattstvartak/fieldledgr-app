@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(npx expo export:*)",
+      "Bash(echo:*)",
+      "Bash(source ~/.bashrc)",
+      "Bash(adb:*)",
+      "Bash(export ANDROID_HOME=\"/mnt/c/Users/matts/AppData/Local/Android/Sdk\":*)",
+      "Bash(\"$ANDROID_HOME/platform-tools/adb.exe\" --version)",
+      "Bash(ls -la \"C:\\\\Users\\\\matts\\\\development\\\\fieldledgr-app\\\\src\"\" 2>/dev/null || echo \"src not found, checking app structure \")",
+      "Bash(wsl ls:*)",
+      "Bash(wsl -e ls:*)",
+      "Bash(wsl.exe ls:*)",
+      "Bash(pnpm payload migrate:create:*)",
+      "Bash(npx cross-env:*)",
+      "Bash(NODE_OPTIONS=--no-deprecation npx payload migrate:create:*)",
+      "Bash(ls:*)",
+      "Bash(pnpm install:*)",
+      "Bash(test:*)",
+      "Bash(yes:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "gemini-cli"
+  ]
+}

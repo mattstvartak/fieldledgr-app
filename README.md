@@ -1,50 +1,120 @@
-# Welcome to your Expo app 👋
+# FieldLedgr Mobile Companion
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mobile companion app for **FieldLedgr** — built for field workers and crew members on the Team plan. This is NOT a duplicate of the web app; it's specifically designed for the crew on the ground.
 
-## Get started
+## What This App Does
 
-1. Install dependencies
+- **Today View** — See today's assigned jobs, clock in/out, quick status updates
+- **My Jobs** — Full list of assigned jobs with filtering, detailed job views, tap-to-call/navigate
+- **Time Tracking** — Clock in/out with GPS, break tracking, running timer, weekly timesheets
+- **Notifications** — New assignments, schedule changes, messages from the owner
+- **Offline Support** — Queue actions when offline, auto-sync when back online
 
-   ```bash
-   npm install
-   ```
+## Tech Stack
 
-2. Start the app
+- React Native with Expo (managed workflow, SDK 54)
+- TypeScript (strict mode)
+- Expo Router (file-based navigation)
+- TanStack Query (server state)
+- Zustand (client state)
+- React Native Paper (UI components)
+- React Hook Form + Zod (form validation)
 
-   ```bash
-   npx expo start
-   ```
+## Getting Started
 
-In the output, you'll find options to open the app in a
+### Prerequisites
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Node.js 18+
+- pnpm (or npm/yarn)
+- Expo Go app on your device (iOS or Android)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### Installation
 
 ```bash
-npm run reset-project
+pnpm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Environment Variables
 
-## Learn more
+Create a `.env.local` file in the project root:
 
-To learn more about developing your project with Expo, look at the following resources:
+```env
+EXPO_PUBLIC_API_URL=https://your-fieldledgr-api.com
+```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+For local development with mock data, no API URL is needed — the app defaults to mock data in dev mode.
 
-## Join the community
+### Running the App
 
-Join our community of developers creating universal apps.
+```bash
+# Start the Expo dev server
+pnpm start
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# Run on iOS simulator
+pnpm ios
+
+# Run on Android emulator
+pnpm android
+```
+
+Scan the QR code with Expo Go on your device to run the app.
+
+### Mock Data
+
+The app ships with a mock data layer that's active by default in development. All screens are fully demoable without a running backend. Mock data is controlled by the `useMockData` setting in `appSettingsStore`.
+
+## Project Structure
+
+```
+app/                          # Expo Router file-based routes
+  (auth)/                     # Auth group (login)
+  (tabs)/                     # Main tab navigator
+    index.tsx                 # Today View
+    jobs/                     # Jobs stack
+      index.tsx               # Jobs list
+      [id].tsx                # Job detail
+    timesheet.tsx             # Time tracking
+    notifications.tsx         # Notifications
+src/
+  api/                        # API client and endpoint definitions
+  components/                 # Reusable UI components
+    ui/                       # Base primitives (StatusBadge, LargeButton, etc.)
+    jobs/                     # Job-specific components
+    time-tracking/            # Clock button, timer banner
+    offline/                  # Offline status banner
+  hooks/                      # Custom hooks (useAuth, useJobs, etc.)
+  stores/                     # Zustand stores (auth, offline queue, settings)
+  lib/                        # Utilities (formatting, location, camera, offline queue)
+  constants/                  # Theme and config
+  mocks/                      # Mock data for development
+  types/                      # TypeScript type definitions
+```
+
+## Design Principles
+
+- **Utilitarian** — Large touch targets (48px min), high contrast, sunlight-readable
+- **Glove-friendly** — Big buttons, no tiny icon-only actions
+- **Colorblind-safe** — Status colors paired with icons and text labels
+- **Offline-first** — Actions queue locally and sync when connectivity returns
+- **Dark mode** — Full support for early mornings and late evenings
+
+## API Integration
+
+The app is designed to work with a Payload CMS REST API. Key endpoints:
+
+- `POST /api/users/login` — Authentication
+- `GET /api/jobs` — Job queries with Payload filter syntax
+- `POST /api/time-entries` — Clock in/out, breaks
+- `GET /api/notifications` — Notification feed
+
+All API types have `// TODO: sync with Payload types` comments where they need to match the backend schema.
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm start` | Start Expo dev server |
+| `pnpm ios` | Run on iOS simulator |
+| `pnpm android` | Run on Android emulator |
+| `pnpm lint` | Run ESLint |
+| `pnpm format` | Run Prettier |

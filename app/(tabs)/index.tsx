@@ -1,98 +1,116 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import React, { useCallback } from 'react';
+import { StyleSheet, View, FlatList, RefreshControl } from 'react-native';
+import { Text, Divider, useTheme } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { JobCard } from '@/components/jobs/JobCard';
+import { ClockButton } from '@/components/time-tracking/ClockButton';
+import { JobCardSkeleton } from '@/components/ui/SkeletonLoader';
+import { useTodayJobs } from '@/hooks/useJobs';
+import { useAuthStore } from '@/stores/authStore';
+import { formatDate } from '@/lib/formatting';
+import type { Job } from '@/types/job';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+export default function TodayScreen() {
+  const theme = useTheme();
+  const router = useRouter();
+  const user = useAuthStore((s) => s.user);
+  const { data: jobs, isLoading, refetch, isRefetching } = useTodayJobs();
 
-export default function HomeScreen() {
+  const handleJobPress = useCallback(
+    (job: Job) => {
+      router.push(`/jobs/${job.id}`);
+    },
+    [router]
+  );
+
+  const today = new Date().toISOString();
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+    <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]} edges={['top']}>
+      <FlatList
+        data={jobs}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <JobCard job={item} onPress={handleJobPress} />}
+        refreshControl={
+          <RefreshControl refreshing={isRefetching} onRefresh={refetch} />
+        }
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <Text variant="headlineSmall" style={[styles.greeting, { color: theme.colors.onBackground }]}>
+              {getGreeting()}, {user?.firstName ?? 'Team Member'}
+            </Text>
+            <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
+              {formatDate(today)}
+            </Text>
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+            <View style={styles.clockSection}>
+              <ClockButton />
+            </View>
+
+            <Divider style={styles.divider} />
+
+            <Text variant="titleMedium" style={[styles.sectionTitle, { color: theme.colors.onBackground }]}>
+              Today&apos;s Jobs
+            </Text>
+          </View>
+        }
+        ListEmptyComponent={
+          isLoading ? (
+            <View>
+              <JobCardSkeleton />
+              <JobCardSkeleton />
+            </View>
+          ) : (
+            <View style={styles.empty}>
+              <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
+                No jobs scheduled for today.
+              </Text>
+            </View>
+          )
+        }
+        contentContainerStyle={styles.list}
+      />
+    </SafeAreaView>
   );
 }
 
+function getGreeting(): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  return 'Good evening';
+}
+
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+  safe: {
+    flex: 1,
   },
-  stepContainer: {
-    gap: 8,
+  header: {
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    gap: 4,
+  },
+  greeting: {
+    fontWeight: '700',
+  },
+  clockSection: {
+    marginTop: 16,
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  divider: {
+    marginVertical: 12,
+  },
+  sectionTitle: {
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  list: {
+    paddingBottom: 24,
+  },
+  empty: {
+    alignItems: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: 24,
   },
 });
