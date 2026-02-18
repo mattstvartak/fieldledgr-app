@@ -60,11 +60,16 @@ export function formatAddress(address: { street: string; city: string; state: st
 
 export function getJobStatusLabel(status: string): string {
   const labels: Record<string, string> = {
-    assigned: 'Assigned',
+    lead: 'Lead',
+    quoted: 'Quoted',
+    accepted: 'Accepted',
+    scheduled: 'Scheduled',
     en_route: 'En Route',
     on_site: 'On Site',
     in_progress: 'In Progress',
-    complete: 'Complete',
+    completed: 'Completed',
+    paid: 'Paid',
+    canceled: 'Canceled',
   };
   return labels[status] ?? status;
 }

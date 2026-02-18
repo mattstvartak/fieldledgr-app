@@ -54,10 +54,12 @@ class ApiClient {
 
       if (!response.ok) return false;
 
-      const data = (await response.json()) as { token: string; exp: number };
+      const data = (await response.json()) as { token?: string; refreshedToken?: string; exp: number };
+      const newToken = data.refreshedToken ?? data.token;
+      if (!newToken) return false;
       const user = useAuthStore.getState().user;
       if (user) {
-        await useAuthStore.getState().setAuth(user, data.token);
+        await useAuthStore.getState().setAuth(user, newToken);
       }
       return true;
     } catch {

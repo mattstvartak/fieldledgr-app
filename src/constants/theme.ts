@@ -9,13 +9,18 @@ export const brand = {
 } as const;
 
 // Colorblind-friendly status palette — never rely on red/green alone
-export const statusColors = {
-  assigned: { bg: '#E3F2FD', text: '#1565C0', icon: 'clipboard-text-outline' },
+export const statusColors: Record<string, { bg: string; text: string; icon: string }> = {
+  lead: { bg: '#F5F5F5', text: '#757575', icon: 'account-plus-outline' },
+  quoted: { bg: '#E3F2FD', text: '#1565C0', icon: 'file-document-outline' },
+  accepted: { bg: '#E8F5E9', text: '#2E7D32', icon: 'check-decagram-outline' },
+  scheduled: { bg: '#E3F2FD', text: '#1565C0', icon: 'clipboard-text-outline' },
   en_route: { bg: '#FFF3E0', text: '#E65100', icon: 'car' },
   on_site: { bg: '#F3E5F5', text: '#7B1FA2', icon: 'map-marker-check' },
   in_progress: { bg: '#E8F5E9', text: '#2E7D32', icon: 'hammer-wrench' },
-  complete: { bg: '#ECEFF1', text: '#37474F', icon: 'check-circle' },
-} as const;
+  completed: { bg: '#ECEFF1', text: '#37474F', icon: 'check-circle' },
+  paid: { bg: '#E8F5E9', text: '#1B5E20', icon: 'cash-check' },
+  canceled: { bg: '#FFEBEE', text: '#C62828', icon: 'close-circle-outline' },
+};
 
 export const clockedInColor = '#FF6F00'; // Amber/orange — unmissable
 

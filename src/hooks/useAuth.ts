@@ -16,7 +16,12 @@ export function useAuth() {
     queryKey: ['me'],
     queryFn: async () => {
       if (useMockData) return mockUser;
+      // Payload GET /api/users/me returns { user, token, exp, collection }
       const response = await authApi.getMe();
+      if (response.user && response.token) {
+        // Update token if a fresh one was returned
+        await useAuthStore.getState().setAuth(response.user, response.token);
+      }
       return response.user;
     },
     enabled: !!token && !user,

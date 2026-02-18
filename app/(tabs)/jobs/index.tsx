@@ -17,7 +17,7 @@ export default function JobsListScreen() {
 
   const today = new Date().toISOString().split('T')[0];
 
-  const statusFilter: JobStatus | undefined = filter === 'completed' ? 'complete' : undefined;
+  const statusFilter: JobStatus | undefined = filter === 'completed' ? 'completed' : undefined;
   const dateFilter = filter === 'today' ? today : undefined;
 
   const { data: jobs, isLoading, refetch, isRefetching } = useJobs({
@@ -29,7 +29,7 @@ export default function JobsListScreen() {
   const filteredJobs = React.useMemo(() => {
     if (!jobs) return [];
     if (filter === 'upcoming') {
-      return jobs.filter((j) => j.scheduledDate > today && j.status !== 'complete');
+      return jobs.filter((j) => j.scheduledDate > today && j.status !== 'completed');
     }
     return jobs;
   }, [jobs, filter, today]);

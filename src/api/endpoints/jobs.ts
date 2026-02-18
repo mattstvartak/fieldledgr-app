@@ -1,7 +1,5 @@
 import { apiClient } from '@/api/client';
-import type { Job, JobNote, JobPhoto, JobStatus } from '@/types/job';
-
-// TODO: sync with Payload types
+import type { PayloadJob, JobStatus } from '@/types/job';
 
 interface PayloadListResponse<T> {
   docs: T[];
@@ -14,10 +12,11 @@ interface PayloadListResponse<T> {
 }
 
 export const jobsApi = {
-  getMyJobs: (userId: string, filters?: { status?: JobStatus; date?: string }) => {
+  getMyJobs: (userId: number, filters?: { status?: JobStatus; date?: string }) => {
     const params: Record<string, string> = {
-      'where[assignedTo][equals]': userId,
+      'where[assignedTo][equals]': String(userId),
       sort: '-scheduledDate',
+      depth: '1',
     };
     if (filters?.status) {
       params['where[status][equals]'] = filters.status;
@@ -25,18 +24,12 @@ export const jobsApi = {
     if (filters?.date) {
       params['where[scheduledDate][equals]'] = filters.date;
     }
-    return apiClient.get<PayloadListResponse<Job>>('/api/jobs', params);
+    return apiClient.get<PayloadListResponse<PayloadJob>>('/api/jobs', params);
   },
 
-  getJob: (id: string) => apiClient.get<Job>(`/api/jobs/${id}`),
+  getJob: (id: string) =>
+    apiClient.get<PayloadJob>(`/api/jobs/${id}`, { depth: '1' }),
 
   updateJobStatus: (id: string, status: JobStatus) =>
-    apiClient.patch<Job>(`/api/jobs/${id}`, { status }),
-
-  addNote: (jobId: string, note: Omit<JobNote, 'id' | 'createdAt'>) =>
-    apiClient.post<JobNote>(`/api/jobs/${jobId}/notes`, note),
-
-  addPhoto: (jobId: string, photo: Omit<JobPhoto, 'id' | 'createdAt'>) =>
-    // TODO: implement multipart upload for photos
-    apiClient.post<JobPhoto>(`/api/jobs/${jobId}/photos`, photo),
+    apiClient.patch<PayloadJob>(`/api/jobs/${id}`, { status }),
 };

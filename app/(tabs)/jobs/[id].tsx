@@ -228,7 +228,7 @@ export default function JobDetailScreen() {
         )}
 
         {/* Jobsite Documentation — only show for active (non-complete) jobs */}
-        {job.status !== 'complete' && (
+        {job.status !== 'completed' && (
           <Card style={styles.card} mode="outlined">
             <Card.Content style={styles.cardContent}>
               <Text variant="titleMedium" style={styles.cardTitle}>Jobsite Documentation</Text>
@@ -286,7 +286,7 @@ export default function JobDetailScreen() {
         )}
 
         {/* Clock In/Out */}
-        {job.status !== 'complete' && (
+        {job.status !== 'completed' && (
           <>
             <Divider style={styles.divider} />
             <View style={styles.section}>

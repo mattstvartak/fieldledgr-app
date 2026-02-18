@@ -11,8 +11,10 @@ interface StatusBadgeProps {
   size?: 'small' | 'medium';
 }
 
+const fallbackColors = { bg: '#F5F5F5', text: '#757575', icon: 'help-circle-outline' };
+
 export function StatusBadge({ status, size = 'medium' }: StatusBadgeProps) {
-  const colors = statusColors[status];
+  const colors = statusColors[status] ?? fallbackColors;
   const isSmall = size === 'small';
 
   return (

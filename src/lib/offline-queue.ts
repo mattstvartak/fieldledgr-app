@@ -2,6 +2,7 @@ import NetInfo from '@react-native-community/netinfo';
 import { useOfflineQueueStore } from '@/stores/offlineQueueStore';
 import { timeEntriesApi } from '@/api/endpoints/time-entries';
 import { jobNotesApi } from '@/api/endpoints/job-notes';
+import { jobPhotosApi } from '@/api/endpoints/job-photos';
 import { jobsApi } from '@/api/endpoints/jobs';
 import type { JobStatus } from '@/types/job';
 
@@ -46,8 +47,12 @@ async function processAction(action: ReturnType<typeof useOfflineQueueStore.getS
       await jobNotesApi.addNote(payload.jobId as string, payload.text as string);
       break;
     case 'add-photo':
-      // TODO: implement photo upload from offline queue
-      console.warn('[OfflineQueue] Photo upload from queue not yet implemented');
+      await jobPhotosApi.addPhoto(
+        payload.jobId as string,
+        payload.uri as string,
+        payload.category as 'before' | 'during' | 'after',
+        payload.caption as string | undefined,
+      );
       break;
   }
 }

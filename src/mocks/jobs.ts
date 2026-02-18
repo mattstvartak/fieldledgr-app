@@ -5,12 +5,12 @@ const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
 export const mockJobs: Job[] = [
   {
-    id: 'job_001',
+    id: '1',
     title: 'Kitchen Remodel - Phase 2',
     description: 'Complete cabinet installation and countertop templating.',
-    status: 'assigned',
+    status: 'scheduled',
     client: {
-      id: 'client_001',
+      id: '1',
       name: 'Sarah Mitchell',
       phone: '(555) 867-5309',
       email: 'sarah@example.com',
@@ -26,7 +26,7 @@ export const mockJobs: Job[] = [
     scheduledDate: today,
     scheduledStartTime: '08:00',
     scheduledEndTime: '12:00',
-    assignedTo: ['user_001'],
+    assignedTo: ['1'],
     lineItems: [
       { id: 'li_001', description: 'Upper cabinet installation (6 units)', quantity: 6, unit: 'ea' },
       { id: 'li_002', description: 'Lower cabinet installation (8 units)', quantity: 8, unit: 'ea' },
@@ -42,19 +42,19 @@ export const mockJobs: Job[] = [
     ],
     photos: [],
     statusHistory: [
-      { status: 'assigned', timestamp: '2025-12-10T09:00:00Z', userId: 'owner_001' },
+      { status: 'scheduled', timestamp: '2025-12-10T09:00:00Z', changedBy: 'owner_001' },
     ],
     ownerNotes: 'Use the maple cabinets from the warehouse, NOT the oak. Client upgraded last week.',
     createdAt: '2025-12-10T09:00:00Z',
     updatedAt: '2025-12-10T09:00:00Z',
   },
   {
-    id: 'job_002',
+    id: '2',
     title: 'Deck Repair',
     description: 'Replace rotted boards on front deck and re-stain.',
-    status: 'assigned',
+    status: 'scheduled',
     client: {
-      id: 'client_002',
+      id: '2',
       name: 'Tom Reynolds',
       phone: '(555) 555-0142',
       email: 'tom.reynolds@example.com',
@@ -70,7 +70,7 @@ export const mockJobs: Job[] = [
     scheduledDate: today,
     scheduledStartTime: '13:00',
     scheduledEndTime: '17:00',
-    assignedTo: ['user_001'],
+    assignedTo: ['1'],
     lineItems: [
       { id: 'li_004', description: 'Remove rotted deck boards', quantity: 12, unit: 'boards' },
       { id: 'li_005', description: 'Install pressure-treated lumber', quantity: 12, unit: 'boards' },
@@ -79,19 +79,19 @@ export const mockJobs: Job[] = [
     notes: [],
     photos: [],
     statusHistory: [
-      { status: 'assigned', timestamp: '2025-12-11T14:00:00Z', userId: 'owner_001' },
+      { status: 'scheduled', timestamp: '2025-12-11T14:00:00Z', changedBy: 'owner_001' },
     ],
     ownerNotes: 'Materials already on site behind the garage.',
     createdAt: '2025-12-11T14:00:00Z',
     updatedAt: '2025-12-11T14:00:00Z',
   },
   {
-    id: 'job_003',
+    id: '3',
     title: 'Bathroom Tile Installation',
     description: 'Install floor and shower tile in master bathroom.',
-    status: 'assigned',
+    status: 'scheduled',
     client: {
-      id: 'client_003',
+      id: '3',
       name: 'Lisa Chen',
       phone: '(555) 321-9876',
       email: 'lisa.chen@example.com',
@@ -107,7 +107,7 @@ export const mockJobs: Job[] = [
     scheduledDate: tomorrow,
     scheduledStartTime: '09:00',
     scheduledEndTime: '16:00',
-    assignedTo: ['user_001'],
+    assignedTo: ['1'],
     lineItems: [
       { id: 'li_007', description: 'Floor tile installation', quantity: 60, unit: 'sq ft' },
       { id: 'li_008', description: 'Shower tile installation', quantity: 45, unit: 'sq ft' },
@@ -123,18 +123,18 @@ export const mockJobs: Job[] = [
     ],
     photos: [],
     statusHistory: [
-      { status: 'assigned', timestamp: '2025-12-12T10:00:00Z', userId: 'owner_001' },
+      { status: 'scheduled', timestamp: '2025-12-12T10:00:00Z', changedBy: 'owner_001' },
     ],
     createdAt: '2025-12-12T10:00:00Z',
     updatedAt: '2025-12-12T10:00:00Z',
   },
   {
-    id: 'job_004',
+    id: '4',
     title: 'Fence Post Replacement',
     description: 'Replace 4 rotted fence posts along north property line.',
-    status: 'complete',
+    status: 'completed',
     client: {
-      id: 'client_004',
+      id: '4',
       name: 'Dave Park',
       phone: '(555) 444-7890',
       address: {
@@ -149,7 +149,7 @@ export const mockJobs: Job[] = [
     scheduledDate: new Date(Date.now() - 86400000).toISOString().split('T')[0],
     scheduledStartTime: '10:00',
     scheduledEndTime: '14:00',
-    assignedTo: ['user_001'],
+    assignedTo: ['1'],
     lineItems: [
       { id: 'li_010', description: 'Remove old fence posts', quantity: 4, unit: 'ea' },
       { id: 'li_011', description: 'Install new 4x4 treated posts', quantity: 4, unit: 'ea' },
@@ -158,11 +158,11 @@ export const mockJobs: Job[] = [
     notes: [],
     photos: [],
     statusHistory: [
-      { status: 'assigned', timestamp: '2025-12-08T08:00:00Z', userId: 'owner_001' },
-      { status: 'en_route', timestamp: '2025-12-09T09:50:00Z', userId: 'user_001' },
-      { status: 'on_site', timestamp: '2025-12-09T10:05:00Z', userId: 'user_001' },
-      { status: 'in_progress', timestamp: '2025-12-09T10:10:00Z', userId: 'user_001' },
-      { status: 'complete', timestamp: '2025-12-09T13:45:00Z', userId: 'user_001' },
+      { status: 'scheduled', timestamp: '2025-12-08T08:00:00Z', changedBy: 'owner_001' },
+      { status: 'en_route', timestamp: '2025-12-09T09:50:00Z', changedBy: '1' },
+      { status: 'on_site', timestamp: '2025-12-09T10:05:00Z', changedBy: '1' },
+      { status: 'in_progress', timestamp: '2025-12-09T10:10:00Z', changedBy: '1' },
+      { status: 'completed', timestamp: '2025-12-09T13:45:00Z', changedBy: '1' },
     ],
     createdAt: '2025-12-08T08:00:00Z',
     updatedAt: '2025-12-09T13:45:00Z',

@@ -9,12 +9,11 @@ interface JobStatusActionsProps {
   currentStatus: JobStatus;
 }
 
-const STATUS_FLOW: Record<JobStatus, { next: JobStatus; label: string; icon: string } | null> = {
-  assigned: { next: 'en_route', label: 'Mark En Route', icon: 'car' },
+const STATUS_FLOW: Partial<Record<JobStatus, { next: JobStatus; label: string; icon: string }>> = {
+  scheduled: { next: 'en_route', label: 'Mark En Route', icon: 'car' },
   en_route: { next: 'on_site', label: 'Arrived On Site', icon: 'map-marker-check' },
   on_site: { next: 'in_progress', label: 'Start Work', icon: 'hammer-wrench' },
-  in_progress: { next: 'complete', label: 'Mark Complete', icon: 'check-circle' },
-  complete: null,
+  in_progress: { next: 'completed', label: 'Mark Complete', icon: 'check-circle' },
 };
 
 export function JobStatusActions({ jobId, currentStatus }: JobStatusActionsProps) {

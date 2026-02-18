@@ -14,7 +14,7 @@ interface AuthState {
   loadStoredAuth: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   token: null,
   isLoading: true,
@@ -34,10 +34,37 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const token = await SecureStore.getItemAsync(config.tokenStorageKey);
       if (token) {
-        // TODO: validate token with API (GET /api/users/me) and fetch user
-        // For now, we just store the token and mark as authenticated.
-        // The actual user data will be fetched by the auth hook on app load.
-        set({ token, isLoading: false });
+        // Validate token by fetching current user from API
+        try {
+          const response = await fetch(
+            new URL('/api/users/me', config.apiUrl).toString(),
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            },
+          );
+
+          if (response.ok) {
+            const data = (await response.json()) as { user: User; token: string; exp: number };
+            if (data.user) {
+              set({ user: data.user, token: data.token || token, isAuthenticated: true, isLoading: false });
+              if (data.token && data.token !== token) {
+                await SecureStore.setItemAsync(config.tokenStorageKey, data.token);
+              }
+              return;
+            }
+          }
+
+          // Token was invalid — clear it
+          await SecureStore.deleteItemAsync(config.tokenStorageKey);
+          set({ isLoading: false });
+        } catch {
+          // Network error — keep the token for offline use, the useAuth hook
+          // will re-validate when connectivity returns
+          set({ token, isLoading: false });
+        }
       } else {
         set({ isLoading: false });
       }

@@ -1,5 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { jobsApi } from '@/api/endpoints/jobs';
+import { jobNotesApi } from '@/api/endpoints/job-notes';
+import { jobPhotosApi } from '@/api/endpoints/job-photos';
+import { transformJob, transformJobList } from '@/api/transforms/job';
 import { useAuthStore } from '@/stores/authStore';
 import { useAppSettingsStore } from '@/stores/appSettingsStore';
 import { useOfflineQueueStore } from '@/stores/offlineQueueStore';
@@ -24,8 +27,8 @@ export function useJobs(filters?: { status?: JobStatus; date?: string }) {
         return filtered;
       }
       if (!userId) throw new Error('Not authenticated');
-      const result = await jobsApi.getMyJobs(String(userId), filters);
-      return result.docs;
+      const result = await jobsApi.getMyJobs(userId, filters);
+      return transformJobList(result.docs);
     },
     enabled: !!userId || useMockData,
   });
@@ -42,7 +45,15 @@ export function useJob(id: string) {
         if (!job) throw new Error('Job not found');
         return job;
       }
-      return jobsApi.getJob(id);
+
+      // Parallel-fetch job, notes, and photos
+      const [raw, notesResult, photosResult] = await Promise.all([
+        jobsApi.getJob(id),
+        jobNotesApi.getNotes(id),
+        jobPhotosApi.getPhotos(id),
+      ]);
+
+      return transformJob(raw, notesResult.docs, photosResult.docs);
     },
   });
 }
