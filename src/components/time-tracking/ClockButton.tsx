@@ -1,9 +1,9 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text, useTheme } from 'react-native-paper';
+import { format } from 'date-fns';
 import { LargeButton } from '@/components/ui/LargeButton';
 import { useTimeTracking, type ClockState } from '@/hooks/useTimeTracking';
-import { formatDuration } from '@/lib/formatting';
 import { clockedInColor, touchTargets } from '@/constants/theme';
 
 interface ClockButtonProps {
@@ -11,16 +11,20 @@ interface ClockButtonProps {
   jobId?: string;
 }
 
+function formatClockInTime(date: Date | null): string {
+  if (!date) return '';
+  return format(date, 'h:mm a');
+}
+
 export function ClockButton({ compact = false, jobId }: ClockButtonProps) {
-  const { clockState, elapsedSeconds, clockIn, clockOut, startBreak, endBreak } =
-    useTimeTracking();
+  const { clockState, clockInTime, clockIn, clockOut, startBreak, endBreak } = useTimeTracking();
   const theme = useTheme();
 
   if (compact) {
     return (
       <CompactClockButton
         clockState={clockState}
-        elapsedSeconds={elapsedSeconds}
+        clockInTime={clockInTime}
         onClockIn={() => clockIn(jobId)}
         onClockOut={clockOut}
       />
@@ -30,16 +34,16 @@ export function ClockButton({ compact = false, jobId }: ClockButtonProps) {
   return (
     <View style={styles.container}>
       {clockState === 'clocked_in' && (
-        <View style={[styles.timerBanner, { backgroundColor: clockedInColor }]}>
-          <Text style={styles.timerText}>{formatDuration(elapsedSeconds)}</Text>
-          <Text style={styles.timerLabel}>Clocked In</Text>
+        <View style={[styles.statusBanner, { backgroundColor: clockedInColor }]}>
+          <Text style={styles.statusLabel}>Clocked In</Text>
+          <Text style={styles.statusTime}>since {formatClockInTime(clockInTime)}</Text>
         </View>
       )}
 
       {clockState === 'on_break' && (
-        <View style={[styles.timerBanner, { backgroundColor: theme.colors.secondary }]}>
-          <Text style={styles.timerText}>{formatDuration(elapsedSeconds)}</Text>
-          <Text style={styles.timerLabel}>On Break</Text>
+        <View style={[styles.statusBanner, { backgroundColor: theme.colors.secondary }]}>
+          <Text style={styles.statusLabel}>On Break</Text>
+          <Text style={styles.statusTime}>clocked in at {formatClockInTime(clockInTime)}</Text>
         </View>
       )}
 
@@ -82,12 +86,12 @@ export function ClockButton({ compact = false, jobId }: ClockButtonProps) {
 
 function CompactClockButton({
   clockState,
-  elapsedSeconds,
+  clockInTime,
   onClockIn,
   onClockOut,
 }: {
   clockState: ClockState;
-  elapsedSeconds: number;
+  clockInTime: Date | null;
   onClockIn: () => void;
   onClockOut: () => void;
 }) {
@@ -106,8 +110,8 @@ function CompactClockButton({
 
   return (
     <View style={styles.compactRow}>
-      <View style={[styles.compactTimer, { backgroundColor: clockedInColor }]}>
-        <Text style={styles.compactTimerText}>{formatDuration(elapsedSeconds)}</Text>
+      <View style={[styles.compactStatus, { backgroundColor: clockedInColor }]}>
+        <Text style={styles.compactStatusText}>In at {formatClockInTime(clockInTime)}</Text>
       </View>
       <LargeButton
         label="Clock Out"
@@ -124,18 +128,17 @@ const styles = StyleSheet.create({
   container: {
     gap: 12,
   },
-  timerBanner: {
+  statusBanner: {
     alignItems: 'center',
     paddingVertical: 16,
     borderRadius: 12,
   },
-  timerText: {
-    fontSize: 36,
+  statusLabel: {
+    fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
-    fontVariant: ['tabular-nums'],
   },
-  timerLabel: {
+  statusTime: {
     fontSize: 14,
     color: '#FFFFFF',
     fontWeight: '600',
@@ -153,17 +156,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 12,
   },
-  compactTimer: {
+  compactStatus: {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
     minHeight: touchTargets.minimum,
     justifyContent: 'center',
   },
-  compactTimerText: {
-    fontSize: 20,
+  compactStatusText: {
+    fontSize: 16,
     fontWeight: '700',
     color: '#FFFFFF',
-    fontVariant: ['tabular-nums'],
   },
 });

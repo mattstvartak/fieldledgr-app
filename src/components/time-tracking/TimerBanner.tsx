@@ -1,17 +1,18 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native-paper';
+import { format } from 'date-fns';
 import MaterialIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useTimeTracking } from '@/hooks/useTimeTracking';
-import { formatDuration } from '@/lib/formatting';
 import { clockedInColor } from '@/constants/theme';
 
 export function TimerBanner() {
-  const { clockState, elapsedSeconds } = useTimeTracking();
+  const { clockState, clockInTime } = useTimeTracking();
 
   if (clockState === 'clocked_out') return null;
 
   const isBreak = clockState === 'on_break';
+  const timeStr = clockInTime ? format(clockInTime, 'h:mm a') : '';
 
   return (
     <View style={[styles.banner, { backgroundColor: isBreak ? '#F5A623' : clockedInColor }]}>
@@ -21,7 +22,7 @@ export function TimerBanner() {
         color="#FFFFFF"
       />
       <Text style={styles.text}>
-        {isBreak ? 'On Break' : 'Clocked In'} — {formatDuration(elapsedSeconds)}
+        {isBreak ? 'On Break' : 'Clocked In'} since {timeStr}
       </Text>
     </View>
   );
@@ -40,6 +41,5 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontWeight: '700',
     fontSize: 16,
-    fontVariant: ['tabular-nums'],
   },
 });
