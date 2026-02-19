@@ -2,9 +2,9 @@ import { MD3LightTheme, MD3DarkTheme, type MD3Theme } from 'react-native-paper';
 
 // FieldLedgr brand colors
 export const brand = {
-  primary: '#2D5016', // Deep forest green
-  primaryLight: '#4A7A2E',
-  primaryDark: '#1a2e0d',
+  primary: '#2A9D6E', // FieldLedgr green (matches web)
+  primaryLight: '#34C88A',
+  primaryDark: '#1D7A52',
   accent: '#F5A623', // Warm amber for CTAs
 } as const;
 
@@ -29,7 +29,7 @@ export const lightTheme: MD3Theme = {
   colors: {
     ...MD3LightTheme.colors,
     primary: brand.primary,
-    primaryContainer: '#d4edbc',
+    primaryContainer: '#b8f0d4',
     secondary: brand.accent,
     secondaryContainer: '#fde8c8',
     background: '#FAFAFA',
@@ -49,8 +49,8 @@ export const darkTheme: MD3Theme = {
   ...MD3DarkTheme,
   colors: {
     ...MD3DarkTheme.colors,
-    primary: '#8CC665',
-    primaryContainer: '#2D5016',
+    primary: '#34C88A',
+    primaryContainer: '#1D7A52',
     secondary: '#F5A623',
     secondaryContainer: '#5C3D00',
     background: '#121212',

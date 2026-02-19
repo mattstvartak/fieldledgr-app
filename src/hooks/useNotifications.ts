@@ -7,9 +7,10 @@ import {
   addNotificationReceivedListener,
   addNotificationResponseListener,
 } from '@/lib/notifications';
+import { Platform } from 'react-native';
 import { notificationsApi } from '@/api/endpoints/notifications';
+import { apiClient } from '@/api/client';
 import { useAuthStore } from '@/stores/authStore';
-import { useAppSettingsStore } from '@/stores/appSettingsStore';
 
 export function useNotifications() {
   const router = useRouter();
@@ -17,7 +18,6 @@ export function useNotifications() {
   const userId = useAuthStore((s) => s.user?.id) ?? 0;
   const numericUserId = typeof userId === 'string' ? Number(userId) : userId;
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
-  const useMockData = useAppSettingsStore((s) => s.useMockData);
   const responseListener = useRef<Notifications.EventSubscription | null>(null);
   const receivedListener = useRef<Notifications.EventSubscription | null>(null);
 
@@ -27,8 +27,12 @@ export function useNotifications() {
 
     registerForPushNotifications().then((token) => {
       if (token) {
-        // TODO: send push token to backend: POST /api/users/push-token { token }
-        console.log('[Notifications] Push token:', token);
+        const platform = Platform.OS === 'ios' ? 'ios' : 'android';
+        apiClient
+          .post('/api/users/push-token', { token, platform })
+          .catch(() => {
+            // Best-effort — silently swallow errors
+          });
       }
     });
 
@@ -56,11 +60,10 @@ export function useNotifications() {
   const unreadQuery = useQuery({
     queryKey: ['unread-count', numericUserId],
     queryFn: async () => {
-      if (useMockData) return 2; // mock: 2 unread
       const result = await notificationsApi.getUnreadCount();
       return result.count;
     },
-    enabled: isAuthenticated || useMockData,
+    enabled: isAuthenticated,
     refetchInterval: 30_000, // poll every 30s
   });
 

@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { StyleSheet, View, ScrollView, Linking, Platform } from 'react-native';
 import { Text, Card, Divider, useTheme, IconButton } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocalSearchParams, Stack } from 'expo-router';
+import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import MaterialIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { JobStatusActions } from '@/components/jobs/JobStatusActions';
@@ -13,6 +13,8 @@ import { VoiceNoteButton } from '@/components/jobs/VoiceNoteButton';
 import { ClockButton } from '@/components/time-tracking/ClockButton';
 import { SkeletonLoader } from '@/components/ui/SkeletonLoader';
 import { useJob } from '@/hooks/useJobs';
+import { useAuthStore } from '@/stores/authStore';
+import { isOwner as checkIsOwner } from '@/lib/roles';
 import {
   formatTimeRange,
   formatAddress,
@@ -26,6 +28,9 @@ import type { JobPhoto, JobNote } from '@/types/job';
 export default function JobDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const theme = useTheme();
+  const router = useRouter();
+  const role = useAuthStore((s) => s.user?.role);
+  const isOwner = checkIsOwner(role);
   const { data: job, isLoading } = useJob(id);
 
   // Local state for optimistic photo/note additions
@@ -74,7 +79,7 @@ export default function JobDetailScreen() {
   if (isLoading) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-        <Stack.Screen options={{ headerShown: true, title: 'Loading...' }} />
+        <Stack.Screen options={{ title: 'Loading...' }} />
         <View style={styles.loadingContainer}>
           <SkeletonLoader width="80%" height={28} />
           <SkeletonLoader width="50%" height={20} style={{ marginTop: 12 }} />
@@ -88,7 +93,7 @@ export default function JobDetailScreen() {
   if (!job) {
     return (
       <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
-        <Stack.Screen options={{ headerShown: true, title: 'Not Found' }} />
+        <Stack.Screen options={{ title: 'Not Found' }} />
         <View style={styles.empty}>
           <Text variant="bodyLarge">Job not found.</Text>
         </View>
@@ -103,11 +108,18 @@ export default function JobDetailScreen() {
     <SafeAreaView style={[styles.safe, { backgroundColor: theme.colors.background }]}>
       <Stack.Screen
         options={{
-          headerShown: true,
           title: job.title,
           headerBackTitle: 'Jobs',
-          headerStyle: { backgroundColor: theme.colors.surface },
-          headerTintColor: theme.colors.onSurface,
+          headerRight: isOwner
+            ? () => (
+                <IconButton
+                  icon="pencil"
+                  size={20}
+                  style={{ margin: 0 }}
+                  onPress={() => router.push(`/(tabs)/jobs/edit?id=${id}` as never)}
+                />
+              )
+            : undefined,
         }}
       />
       <ScrollView contentContainerStyle={styles.scroll}>

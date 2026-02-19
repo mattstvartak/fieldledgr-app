@@ -20,7 +20,16 @@
       "Bash(ls:*)",
       "Bash(pnpm install:*)",
       "Bash(test:*)",
-      "Bash(yes:*)"
+      "Bash(yes:*)",
+      "Bash(npx expo lint:*)",
+      "Bash(node -e:*)",
+      "Bash(npx --yes sharp-cli:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(pnpm ls:*)",
+      "Bash(pnpm why:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

@@ -11,7 +11,7 @@ export type JobStatus =
   | 'paid'
   | 'canceled';
 
-/** Statuses a technician can see/act on in the mobile app */
+/** Statuses a team member can see/act on in the mobile app */
 export type TechnicianJobStatus = 'scheduled' | 'en_route' | 'on_site' | 'in_progress' | 'completed';
 
 /** Payload Customer as returned with depth=1 */

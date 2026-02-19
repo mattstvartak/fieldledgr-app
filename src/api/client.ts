@@ -79,7 +79,15 @@ class ApiClient {
 
   private log(method: string, url: string, body?: unknown) {
     if (config.isDev) {
-      console.log(`[API] ${method} ${url}`, body ? JSON.stringify(body).slice(0, 200) : '');
+      let safeBody = '';
+      if (body && typeof body === 'object') {
+        const redacted = { ...(body as Record<string, unknown>) };
+        for (const key of ['password', 'token', 'secret', 'refreshToken']) {
+          if (key in redacted) redacted[key] = '[REDACTED]';
+        }
+        safeBody = JSON.stringify(redacted).slice(0, 200);
+      }
+      console.log(`[API] ${method} ${url}`, safeBody);
     }
   }
 
@@ -157,6 +165,39 @@ class ApiClient {
 
   async delete<T>(path: string): Promise<T> {
     return this.request<T>(path, { method: 'DELETE' });
+  }
+
+  async postFormData<T>(path: string, fileUri: string, fileName: string): Promise<T> {
+    const url = this.buildUrl(path);
+    const token = this.getToken();
+
+    const formData = new FormData();
+    formData.append('file', {
+      uri: fileUri,
+      name: fileName,
+      type: 'image/jpeg',
+    } as unknown as Blob);
+
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    // Do not set Content-Type — let fetch set the multipart boundary
+
+    this.log('POST (FormData)', url);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => 'Unknown error');
+      throw new ApiError(errorBody, response.status);
+    }
+
+    return response.json() as Promise<T>;
   }
 }
 

@@ -61,9 +61,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           await SecureStore.deleteItemAsync(config.tokenStorageKey);
           set({ isLoading: false });
         } catch {
-          // Network error — keep the token for offline use, the useAuth hook
-          // will re-validate when connectivity returns
-          set({ token, isLoading: false });
+          // Network error — keep the token for offline use and mark as
+          // authenticated so the user can access cached data offline
+          set({ token, isAuthenticated: true, isLoading: false });
         }
       } else {
         set({ isLoading: false });

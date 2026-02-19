@@ -55,7 +55,18 @@ export function formatPhone(phone: string): string {
 }
 
 export function formatAddress(address: { street: string; city: string; state: string; zip: string }): string {
-  return `${address.street}, ${address.city}, ${address.state} ${address.zip}`;
+  const parts: string[] = [];
+  if (address.street) parts.push(address.street);
+  const cityStateZip = [
+    address.city,
+    address.state && address.zip
+      ? `${address.state} ${address.zip}`
+      : address.state || address.zip,
+  ]
+    .filter(Boolean)
+    .join(', ');
+  if (cityStateZip) parts.push(cityStateZip);
+  return parts.join(', ') || 'No address';
 }
 
 export function getJobStatusLabel(status: string): string {

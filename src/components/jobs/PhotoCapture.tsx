@@ -5,7 +5,6 @@ import { LargeButton } from '@/components/ui/LargeButton';
 import { takePhoto, pickFromLibrary } from '@/lib/camera';
 import { useOfflineQueueStore } from '@/stores/offlineQueueStore';
 import { useAuthStore } from '@/stores/authStore';
-import { useAppSettingsStore } from '@/stores/appSettingsStore';
 import { jobPhotosApi } from '@/api/endpoints/job-photos';
 import { touchTargets } from '@/constants/theme';
 import type { JobPhoto } from '@/types/job';
@@ -19,7 +18,6 @@ interface PhotoCaptureProps {
 
 export function PhotoCapture({ jobId, onPhotoAdded }: PhotoCaptureProps) {
   const userId = String(useAuthStore((s) => s.user?.id) ?? '');
-  const useMockData = useAppSettingsStore((s) => s.useMockData);
   const enqueue = useOfflineQueueStore((s) => s.enqueue);
   const [menuVisible, setMenuVisible] = useState(false);
   const [categoryDialogVisible, setCategoryDialogVisible] = useState(false);
@@ -41,29 +39,12 @@ export function PhotoCapture({ jobId, onPhotoAdded }: PhotoCaptureProps) {
     setCategoryDialogVisible(false);
     setIsUploading(true);
 
-    const photo: Omit<JobPhoto, 'id' | 'createdAt'> = {
-      uri: pendingUri,
-      category,
-      createdBy: userId,
-    };
-
     try {
-      if (useMockData) {
-        // Simulate upload
-        await new Promise((r) => setTimeout(r, 500));
-        const mockPhoto: JobPhoto = {
-          ...photo,
-          id: `photo_${Date.now()}`,
-          createdAt: new Date().toISOString(),
-        };
-        onPhotoAdded?.(mockPhoto);
-      } else {
-        try {
-          const saved = await jobPhotosApi.addPhoto(jobId, pendingUri, category);
-          onPhotoAdded?.(saved as unknown as JobPhoto);
-        } catch {
-          await enqueue('add-photo', { jobId, uri: pendingUri, category, userId });
-        }
+      try {
+        const saved = await jobPhotosApi.addPhoto(jobId, pendingUri, category);
+        onPhotoAdded?.(saved as unknown as JobPhoto);
+      } catch {
+        await enqueue('add-photo', { jobId, uri: pendingUri, category, userId });
       }
     } finally {
       setIsUploading(false);

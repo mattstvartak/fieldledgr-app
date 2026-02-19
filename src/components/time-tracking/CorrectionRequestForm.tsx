@@ -3,7 +3,6 @@ import { StyleSheet, View } from 'react-native';
 import { Text, TextInput, useTheme, Portal, Dialog, RadioButton, HelperText } from 'react-native-paper';
 import { LargeButton } from '@/components/ui/LargeButton';
 import { useAuthStore } from '@/stores/authStore';
-import { useAppSettingsStore } from '@/stores/appSettingsStore';
 import { timeEntriesApi } from '@/api/endpoints/time-entries';
 import type { TimeEntryType } from '@/types/time-entry';
 import { touchTargets } from '@/constants/theme';
@@ -18,7 +17,6 @@ export function CorrectionRequestForm({ visible, onDismiss, date }: CorrectionRe
   const theme = useTheme();
   const userId = useAuthStore((s) => s.user?.id) ?? 0;
   const numericUserId = typeof userId === 'string' ? Number(userId) : userId;
-  const useMockData = useAppSettingsStore((s) => s.useMockData);
   const [type, setType] = useState<TimeEntryType>('clock-in');
   const [time, setTime] = useState('');
   const [reason, setReason] = useState('');
@@ -36,17 +34,13 @@ export function CorrectionRequestForm({ visible, onDismiss, date }: CorrectionRe
     setError(null);
 
     try {
-      if (useMockData) {
-        await new Promise((r) => setTimeout(r, 500));
-      } else {
-        await timeEntriesApi.requestCorrection({
-          user: numericUserId,
-          date,
-          requestedTime: `${date}T${time}:00Z`,
-          requestedType: type,
-          reason: reason.trim(),
-        });
-      }
+      await timeEntriesApi.requestCorrection({
+        user: numericUserId,
+        date,
+        requestedTime: `${date}T${time}:00Z`,
+        requestedType: type,
+        reason: reason.trim(),
+      });
       setSubmitted(true);
     } catch {
       setError('Failed to submit correction request. Please try again.');

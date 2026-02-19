@@ -3,7 +3,6 @@ import { StyleSheet, View } from 'react-native';
 import { TextInput } from 'react-native-paper';
 import { LargeButton } from '@/components/ui/LargeButton';
 import { useAuthStore } from '@/stores/authStore';
-import { useAppSettingsStore } from '@/stores/appSettingsStore';
 import { useOfflineQueueStore } from '@/stores/offlineQueueStore';
 import { jobNotesApi } from '@/api/endpoints/job-notes';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,7 +15,6 @@ interface AddNoteInputProps {
 
 export function AddNoteInput({ jobId, onNoteAdded }: AddNoteInputProps) {
   const userId = String(useAuthStore((s) => s.user?.id) ?? '');
-  const useMockData = useAppSettingsStore((s) => s.useMockData);
   const enqueue = useOfflineQueueStore((s) => s.enqueue);
   const queryClient = useQueryClient();
   const [text, setText] = useState('');
@@ -29,22 +27,11 @@ export function AddNoteInput({ jobId, onNoteAdded }: AddNoteInputProps) {
     setIsSaving(true);
 
     try {
-      if (useMockData) {
-        await new Promise((r) => setTimeout(r, 300));
-        const mockNote: JobNote = {
-          id: `note_${Date.now()}`,
-          text: trimmed,
-          createdBy: userId,
-          createdAt: new Date().toISOString(),
-        };
-        onNoteAdded?.(mockNote);
-      } else {
-        try {
-          const saved = await jobNotesApi.addNote(jobId, trimmed);
-          onNoteAdded?.(saved as unknown as JobNote);
-        } catch {
-          await enqueue('add-note', { jobId, text: trimmed, userId });
-        }
+      try {
+        const saved = await jobNotesApi.addNote(jobId, trimmed);
+        onNoteAdded?.(saved as unknown as JobNote);
+      } catch {
+        await enqueue('add-note', { jobId, text: trimmed, userId });
       }
       setText('');
       queryClient.invalidateQueries({ queryKey: ['job', jobId] });

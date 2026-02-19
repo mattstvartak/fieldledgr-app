@@ -6,7 +6,7 @@ export const mockUser: User = {
   firstName: 'Mike',
   lastName: 'Johnson',
   phone: '(555) 234-5678',
-  role: 'technician',
+  role: 'member',
   business: 1,
   avatarUrl: undefined,
   isActive: true,

@@ -16,7 +16,6 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// TODO: implement actual API calls for each action type
 async function processAction(action: ReturnType<typeof useOfflineQueueStore.getState>['queue'][0]) {
   const { type, payload, gpsCoords } = action;
 

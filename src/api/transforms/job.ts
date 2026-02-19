@@ -62,13 +62,22 @@ export function transformJob(
     return { ...p, uri };
   });
 
+  const client = toClient(raw.customer);
+
+  // Prefer the job's own address (job site) over the customer's address
+  const jobAddress = raw.address;
+  const hasJobAddress = jobAddress && (jobAddress.street || jobAddress.city || jobAddress.state || jobAddress.zip);
+  if (hasJobAddress) {
+    client.address = toAddress(jobAddress);
+  }
+
   return {
     id: String(raw.id),
     title: raw.title,
     description: raw.description ?? undefined,
     status: raw.status,
     jobNumber: raw.jobNumber ?? undefined,
-    client: toClient(raw.customer),
+    client,
     scheduledDate: raw.scheduledDate ?? new Date().toISOString().split('T')[0],
     scheduledStartTime: raw.scheduledStartTime ?? undefined,
     scheduledEndTime: raw.scheduledEndTime ?? undefined,

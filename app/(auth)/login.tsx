@@ -5,9 +5,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useRouter } from 'expo-router';
 import { LargeButton } from '@/components/ui/LargeButton';
+import { Logo } from '@/components/ui/Logo';
 import { useAuth } from '@/hooks/useAuth';
-import { brand } from '@/constants/theme';
 
 const loginSchema = z.object({
   email: z.string().email('Enter a valid email address'),
@@ -18,6 +19,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginScreen() {
   const theme = useTheme();
+  const router = useRouter();
   const { login, isLoggingIn, loginError } = useAuth();
 
   const {
@@ -45,11 +47,9 @@ export default function LoginScreen() {
       >
         <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
           <View style={styles.header}>
-            <Text variant="headlineLarge" style={[styles.brand, { color: brand.primary }]}>
-              FieldLedgr
-            </Text>
-            <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant }}>
-              Sign in to your crew account
+            <Logo size={40} dark />
+            <Text variant="bodyLarge" style={{ color: theme.colors.onSurfaceVariant, marginTop: 4 }}>
+              Built for the trades
             </Text>
           </View>
 
@@ -123,8 +123,10 @@ export default function LoginScreen() {
           <Text
             variant="bodySmall"
             style={[styles.footer, { color: theme.colors.onSurfaceVariant }]}
+            onPress={() => router.push('/(auth)/signup')}
           >
-            Don&apos;t have an account? Ask your team owner to invite you.
+            Don&apos;t have an account?{' '}
+            <Text style={{ color: theme.colors.primary }}>Sign Up</Text>
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -148,10 +150,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 48,
     gap: 8,
-  },
-  brand: {
-    fontWeight: '700',
-    fontSize: 36,
   },
   form: {
     gap: 12,

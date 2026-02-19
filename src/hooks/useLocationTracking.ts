@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useAuthStore } from '@/stores/authStore';
-import { useAppSettingsStore } from '@/stores/appSettingsStore';
+import { useBusiness } from '@/hooks/useBusiness';
 import { requestLocationPermission, getCurrentLocation } from '@/lib/location';
 import { locationLogsApi } from '@/api/endpoints/location-logs';
 
@@ -8,11 +8,12 @@ const TRACKING_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
 export function useLocationTracking() {
   const user = useAuthStore((s) => s.user);
-  const useMockData = useAppSettingsStore((s) => s.useMockData);
+  const { data: business } = useBusiness();
+  const gpsEnabled = business?.gpsTrackingEnabled === true;
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user || !gpsEnabled) return;
 
     let cancelled = false;
 
@@ -20,11 +21,6 @@ export function useLocationTracking() {
       try {
         const coords = await getCurrentLocation();
         if (!coords || cancelled) return;
-
-        if (useMockData) {
-          console.log('[GPS Tracking] Mock ping:', coords);
-          return;
-        }
 
         await locationLogsApi.submit(coords);
       } catch {
@@ -51,5 +47,5 @@ export function useLocationTracking() {
         intervalRef.current = null;
       }
     };
-  }, [user, useMockData]);
+  }, [user, gpsEnabled]);
 }
