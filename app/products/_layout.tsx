@@ -18,6 +18,7 @@ export default function ProductsLayout() {
           ),
         }}
       />
+      <Stack.Screen name="create" options={{ title: 'New Product' }} />
       <Stack.Screen name="[id]" options={{ title: 'Product' }} />
     </Stack>
   );
